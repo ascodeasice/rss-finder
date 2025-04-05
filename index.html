@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RSS Feed Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    input, button {
+      font-size: 1rem;
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 0.3rem 0;
+    }
+    a {
+      color: green;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>📰 RSS Feed Checker</h1>
+  <p>Enter a website URL to check for common RSS feed paths:</p>
+  <input type="text" id="urlInput" placeholder="https://example.com">
+  <button onclick="checkFeeds()">Check Feeds</button>
+
+  <ul id="resultList"></ul>
+
+  <script>
+    const RSS_PATHS = [
+      "rss.xml",
+      "feed",
+      "feed.xml",
+      "atom.xml",
+      "index.xml",
+      "rss",
+      ".rss",
+      "feeds/posts/default"
+    ];
+
+    async function checkFeeds() {
+      const baseUrl = document.getElementById('urlInput').value.trim().replace(/\/+$/, '');
+      const resultList = document.getElementById('resultList');
+      resultList.innerHTML = '';
+
+      if (!baseUrl) {
+        alert("Please enter a valid URL.");
+        return;
+      }
+
+      for (const path of RSS_PATHS) {
+        const fullUrl = `${baseUrl}/${path}`;
+        const li = document.createElement('li');
+        li.textContent = `Checking ${fullUrl} ...`;
+        resultList.appendChild(li);
+
+        try {
+          const response = await fetch(fullUrl, { method: 'HEAD' });
+          if (response.ok) {
+            li.innerHTML = `✅ Found: <a href="${fullUrl}" target="_blank">${fullUrl}</a>`;
+          } else {
+            li.textContent = `❌ Not Found: ${fullUrl} (Status: ${response.status})`;
+          }
+        } catch (error) {
+          li.textContent = `⚠️ Error accessing: ${fullUrl}`;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
